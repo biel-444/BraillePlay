@@ -1,13 +1,12 @@
-# ⠃⠕⠍⠀⠙⠊⠁ — BraillePlay 
+# BraillePlay 
 
-> **Plataforma web educacional e inclusiva para o aprendizado prático do alfabeto Braille e da datilologia em Libras.**
+> **Plataforma web educacional e inclusiva para o aprendizado prático do alfabeto Braille com apoio da datilologia em Libras.**
 
 ![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Latest-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Acessibilidade](https://img.shields.io/badge/Acessibilidade-WCAG_Alineada-22C55E?style=for-the-badge)
 
-O **BraillePlay** é uma aplicação web desenvolvida para tornar o ensino do sistema Braille e de Libras mais interativo, dinâmico e acessível. Através de uma abordagem de aprendizado incremental e gamificada, o usuário pode praticar e testar seus conhecimentos diretamente no navegador, contando com recursos avançados de áudio e suporte total a comandos por teclado.
+O **BraillePlay** é uma aplicação web desenvolvida para tornar o ensino do sistema Braille mais interativo, dinâmico e acessível. Através de uma abordagem de aprendizado incremental e gamificada, o usuário pode praticar e testar seus conhecimentos diretamente no navegador, contando com recursos avançados de áudio e suporte a comandos por teclado.
 
 ---
 
