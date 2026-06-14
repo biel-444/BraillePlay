@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Conversor Braille — BraillePlay{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px; padding-bottom:80px;">
+
+  <!-- Cabeçalho -->
+  <div class="text-center mb-32 anim-fadeInUp">
+    <span class="badge badge-primary mb-12">Módulo 3</span>
+    <h2>Conversor <span class="text-primary">Texto ↔ Braille</span></h2>
+    <p class="mt-8">Digite uma palavra ou frase e veja (e ouça) sua versão em Braille.</p>
+  </div>
+
+  <!-- Entrada -->
+  <div class="card mb-24 anim-fadeInUp delay-100" style="max-width:600px; margin:0 auto;">
+    <label class="text-sm fw-bold text-muted mb-8" style="display:block;">Texto (A–Z, sem acentos)</label>
+    <input
+      type="text"
+      id="conv-input"
+      class="input mb-16"
+      placeholder="Ex.: BOM DIA"
+      maxlength="60"
+      autocomplete="off"
+    />
+    <div class="flex gap-12 justify-center" style="flex-wrap:wrap;">
+      <button class="btn btn-primary" id="conv-btn-converter">🔁 Converter</button>
+      <button class="btn btn-ghost" id="conv-btn-ouvir">🔊 Ouvir frase</button>
+      <button class="btn btn-ghost" id="conv-btn-limpar">🗑 Limpar</button>
+    </div>
+  </div>
+
+  <!-- Resultado -->
+  <div id="conv-resultado" class="hidden" style="max-width:760px; margin:0 auto;">
+
+    <div class="card mb-24 text-center anim-fadeInUp">
+      <p class="text-sm text-muted mb-8" style="font-weight:700;">Braille Unicode</p>
+      <p class="braille-unicode-text" id="conv-unicode"></p>
+    </div>
+
+    <div class="card anim-fadeInUp delay-100">
+      <p class="text-sm text-muted mb-16" style="font-weight:700; text-align:center;">
+        Célula por célula <span style="font-weight:400;">(toque para ouvir)</span>
+      </p>
+      <div class="braille-output-grid" id="conv-grid"></div>
+      <p class="text-sm text-muted mt-16" id="conv-aviso" style="text-align:center;"></p>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var convInput = document.getElementById('conv-input');
+
+document.getElementById('conv-btn-converter').addEventListener('click', converter);
+document.getElementById('conv-btn-ouvir').addEventListener('click', function() {
+  var texto = convInput.value.trim();
+  if (texto) narrar(texto);
+});
+document.getElementById('conv-btn-limpar').addEventListener('click', function() {
+  convInput.value = '';
+  document.getElementById('conv-resultado').classList.add('hidden');
+  convInput.focus();
+});
+convInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') converter();
+});
+
+function converter() {
+  var texto = convInput.value.trim();
+  if (!texto) { toast('Digite algum texto primeiro!', 'info', 1800); return; }
+
+  fetch('/api/converter?texto=' + encodeURIComponent(texto))
+    .then(function(r) { return r.json(); })
+    .then(renderizarResultado)
+    .catch(function() { toast('Erro ao converter o texto.', 'danger'); });
+}
+
+function renderizarResultado(celulas) {
+  var unicodeEl = document.getElementById('conv-unicode');
+  var gridEl    = document.getElementById('conv-grid');
+  var avisoEl   = document.getElementById('conv-aviso');
+
+  var unicodeStr = '';
+  var temNaoSuportado = false;
+  gridEl.innerHTML = '';
+
+  celulas.forEach(function(cel) {
+    unicodeStr += cel.unicode || ' ';
+
+    var item = document.createElement('div');
+    item.className = 'braille-char-item';
+
+    var mini = document.createElement('div');
+    mini.className = 'braille-cell-mini';
+
+    if (cel.letra === ' ') {
+      mini.classList.add('is-space');
+    } else if (cel.pontos === null) {
+      mini.classList.add('is-unsupported');
+      temNaoSuportado = true;
+    }
+
+    [1, 4, 2, 5, 3, 6].forEach(function(n) {
+      var dot = document.createElement('div');
+      dot.className = 'dot-mini';
+      dot.dataset.dot = n;
+      if (cel.pontos && cel.pontos.includes(n)) dot.classList.add('active');
+      mini.appendChild(dot);
+    });
+
+    var label = document.createElement('span');
+    label.className = 'braille-char-label';
+    label.textContent = cel.letra === ' ' ? '␣' : cel.letra;
+
+    item.appendChild(mini);
+    item.appendChild(label);
+
+    if (cel.letra !== ' ' && cel.pontos) {
+      item.style.cursor = 'pointer';
+      item.title = 'Ouvir "' + cel.letra + '"';
+      item.addEventListener('click', function() { narrar(cel.letra); });
+    }
+
+    gridEl.appendChild(item);
+  });
+
+  unicodeEl.textContent = unicodeStr;
+  avisoEl.textContent = temNaoSuportado
+    ? 'Alguns caracteres (números, acentos ou símbolos) ainda não têm Braille mapeado neste conversor.'
+    : '';
+
+  document.getElementById('conv-resultado').classList.remove('hidden');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}BraillePlay — Aprenda Braille Jogando{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <div style="max-width:640px; margin:0 auto; text-align:center;">
+
+      <div class="marquee-dots mb-24 anim-fadeIn">
+        <div class="marquee-dot"></div>
+        <div class="marquee-dot"></div>
+        <div class="marquee-dot"></div>
+        <div class="marquee-dot"></div>
+      </div>
+
+      <div class="anim-fadeInUp">
+        <span class="badge badge-primary mb-16">🎮 Plataforma Educacional</span>
+        <h1 class="glow-text mb-16">
+          Aprenda <span class="accent-text">Braille</span><br>
+          jogando e se divertindo
+        </h1>
+        <p class="text-lg mb-32" style="max-width:480px; margin-left:auto; margin-right:auto;">
+          Explore o alfabeto Braille e as opções de Aprender Braille e Forca Braille.
+        </p>
+      </div>
+
+      <div class="flex gap-16 justify-center anim-fadeInUp delay-100" style="flex-wrap:wrap;">
+        <a href="/aprender" class="btn btn-primary btn-lg">Aprender Braille</a>
+        <a href="/forca"    class="btn btn-accent  btn-lg">Forca Braille</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

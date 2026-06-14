@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}Aprender Braille — BraillePlay{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px; padding-bottom:80px;">
+
+  <!-- Cabeçalho -->
+  <div class="text-center mb-32 anim-fadeInUp">
+    <span class="badge badge-primary mb-12">Módulo 1</span>
+    <h2>Aprender <span class="text-primary">Braille</span></h2>
+    <p class="mt-8">Monte a letra correta na célula Braille.</p>
+  </div>
+
+  <!-- Seção educativa -->
+  <div class="card mb-32 anim-fadeInUp delay-100" style="max-width:700px; margin:0 auto 32px;">
+    <h3 style="color:var(--text); margin-bottom:20px; text-align:center;">
+      Como funciona a <span class="text-primary">célula Braille</span>?
+    </h3>
+    <div class="flex justify-center gap-24" style="flex-wrap:wrap; align-items:center;">
+
+      <div class="text-center">
+        <div class="braille-cell" id="demo-cell" style="margin:0 auto 16px;">
+          <div class="braille-dot" data-dot="1">1</div>
+          <div class="braille-dot" data-dot="4">4</div>
+          <div class="braille-dot" data-dot="2">2</div>
+          <div class="braille-dot" data-dot="5">5</div>
+          <div class="braille-dot" data-dot="3">3</div>
+          <div class="braille-dot" data-dot="6">6</div>
+        </div>
+        <p class="text-sm text-muted" id="demo-label">Toque nos pontos!</p>
+        <p class="fw-black accent-text mt-8" id="demo-letra"
+           style="font-size:1.8rem; min-height:2.4rem;"></p>
+      </div>
+
+      <div style="max-width:300px;">
+        <div class="flex items-center gap-12 mb-12">
+          <span style="font-size:1.4rem;">1️⃣</span>
+          <div>
+            <p class="fw-bold" style="color:var(--text);">6 pontos por célula</p>
+            <p class="text-sm">Numerados de 1 a 6, em duas colunas de três.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-12 mb-12">
+          <span style="font-size:1.4rem;">2️⃣</span>
+          <div>
+            <p class="fw-bold" style="color:var(--text);">Combinações únicas</p>
+            <p class="text-sm">Cada letra tem sua combinação específica de pontos ativos.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-12">
+          <span style="font-size:1.4rem;">3️⃣</span>
+          <div>
+            <p class="fw-bold" style="color:var(--text);">Toque e aprenda</p>
+            <p class="text-sm">Clique nos pontos para descobrir a letra formada!</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modo A — Monte a Letra -->
+  <div style="max-width:600px; margin:0 auto;">
+
+    <div class="flex justify-between items-center mb-24"
+         style="flex-wrap:wrap; gap:12px;">
+      <span class="badge badge-primary">Monte a Letra</span>
+      <div class="flex gap-8 items-center">
+        <button class="btn btn-ghost btn-sm" id="btn-ouvir"
+                aria-label="Ouvir descrição">🔊 Ouvir</button>
+        <button class="btn btn-ghost btn-sm" id="ajuda-btn-a"
+                aria-label="Ajuda">❓ Ajuda</button>
+      </div>
+    </div>
+
+    <!-- Progresso -->
+    <div class="flex justify-between items-center mb-8">
+      <span class="text-sm text-muted">Progresso da sessão</span>
+      <span class="text-sm fw-bold text-primary" id="a-progresso">0 acertos</span>
+    </div>
+    <div class="progress-bar mb-24">
+      <div class="progress-fill" id="a-barra" style="width:0%"></div>
+    </div>
+
+    <div class="card text-center">
+      <p class="text-muted mb-8">Monte a letra na célula Braille:</p>
+
+      <!-- Letra alvo -->
+      <div class="mb-24">
+        <span class="fw-black accent-text" id="a-letra-alvo"
+              style="font-size:5rem; line-height:1;">?</span>
+      </div>
+
+      <!-- Célula interativa -->
+      <div class="braille-cell" id="celula-a" style="margin:0 auto 12px;">
+        <div class="braille-dot" data-dot="1">1</div>
+        <div class="braille-dot" data-dot="4">4</div>
+        <div class="braille-dot" data-dot="2">2</div>
+        <div class="braille-dot" data-dot="5">5</div>
+        <div class="braille-dot" data-dot="3">3</div>
+        <div class="braille-dot" data-dot="6">6</div>
+      </div>
+
+      <p class="text-sm text-muted mb-24">
+        💡 Clique na célula e use as teclas <strong>1</strong> a <strong>6</strong> do teclado para marcar os pontos
+      </p>
+
+      <p class="text-sm text-muted mb-24" id="a-pontos-info">
+        Nenhum ponto selecionado
+      </p>
+
+      <!-- Feedback -->
+      <div id="a-feedback" class="hidden mb-24"></div>
+
+      <!-- Botões -->
+      <div class="flex gap-12 justify-center" style="flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" id="a-btn-limpar">🗑 Limpar</button>
+        <button class="btn btn-primary"      id="a-btn-verificar">✓ Verificar</button>
+        <button class="btn btn-success hidden" id="a-btn-proxima">Próxima →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Todas as variáveis e funções são declaradas no escopo global deste bloco
+// para que os event listeners funcionem sem problemas de hoisting.
+
+var letraAtual = null;
+var aCelula    = null;
+var aAcertos   = 0;
+var TOTAL      = 10;
+var letras     = Object.keys(BRAILLE); // BRAILLE vem de script.js
+
+// ── Célula de demonstração ──────────────────────────────────
+inicializarCelula(
+  document.getElementById('demo-cell'),
+  function(ativos) {
+    var l  = identificarLetra(ativos);
+    var lb = document.getElementById('demo-label');
+    var le = document.getElementById('demo-letra');
+    if (l) {
+      le.textContent = l;
+      lb.textContent = 'Letra: ' + l;
+    } else if (!ativos.length) {
+      le.textContent = '';
+      lb.textContent = 'Toque nos pontos!';
+    } else {
+      le.textContent = '?';
+      lb.textContent = 'Pontos: ' + ativos.slice().sort(function(a,b){return a-b;}).join(', ');
+    }
+  }
+);
+
+// ── Célula principal ────────────────────────────────────────
+aCelula = inicializarCelula(
+  document.getElementById('celula-a'),
+  function(ativos) {
+    document.getElementById('a-pontos-info').textContent = ativos.length
+      ? 'Pontos selecionados: ' + ativos.slice().sort(function(a,b){return a-b;}).join(', ')
+      : 'Nenhum ponto selecionado';
+  }
+);
+
+// ── Botões ──────────────────────────────────────────────────
+document.getElementById('a-btn-limpar').addEventListener('click', function() {
+  aCelula.limpar();
+});
+document.getElementById('a-btn-verificar').addEventListener('click', verificar);
+document.getElementById('a-btn-proxima').addEventListener('click', proximaLetra);
+document.getElementById('btn-ouvir').addEventListener('click', narrarEstado);
+document.getElementById('ajuda-btn-a').addEventListener('click', function() {
+  if (letraAtual) abrirAjuda(letraAtual);
+});
+
+// ── Inicia com a primeira letra ─────────────────────────────
+proximaLetra();
+
+// ── Funções ─────────────────────────────────────────────────
+
+function proximaLetra() {
+  letraAtual = letras[Math.floor(Math.random() * letras.length)];
+
+  document.getElementById('a-letra-alvo').textContent = letraAtual;
+  document.getElementById('a-feedback').classList.add('hidden');
+  document.getElementById('a-btn-verificar').classList.remove('hidden');
+  document.getElementById('a-btn-proxima').classList.add('hidden');
+  document.getElementById('a-pontos-info').textContent = 'Nenhum ponto selecionado';
+
+  aCelula.limpar();
+  setarCelula(true);
+
+  narrar('Nova letra sorteada. Monte a letra ' + letraAtual + ' na célula Braille.');
+}
+
+function verificar() {
+  var usuario  = aCelula.getAtivos().slice().sort(function(a,b){return a-b;});
+  var corretos = (BRAILLE[letraAtual] || []).slice().sort(function(a,b){return a-b;});
+  var acertou  = JSON.stringify(usuario) === JSON.stringify(corretos);
+  var fb       = document.getElementById('a-feedback');
+  var desc     = descreverPontos(corretos);
+
+  fb.classList.remove('hidden');
+
+  if (acertou) {
+    aAcertos++;
+    var pct = Math.min(aAcertos / TOTAL * 100, 100);
+    document.getElementById('a-progresso').textContent =
+      aAcertos + ' acerto' + (aAcertos !== 1 ? 's' : '');
+    document.getElementById('a-barra').style.width = pct + '%';
+
+    fb.innerHTML =
+      '<div class="alert alert-success anim-pop">' +
+      '✅ Correto! A letra <strong>' + letraAtual + '</strong> usa ' + desc + '.' +
+      '</div>';
+
+    document.getElementById('a-btn-verificar').classList.add('hidden');
+    document.getElementById('a-btn-proxima').classList.remove('hidden');
+    setarCelula(false);
+    aCelula.animar();
+    narrar('Correto! A letra ' + letraAtual + ' usa ' + desc + '.');
+
+  } else {
+    var marcados = usuario.length ? usuario.join(', ') : 'nenhum';
+
+    fb.innerHTML =
+      '<div class="alert alert-danger anim-shake">' +
+      '❌ Você marcou: <strong>' + marcados + '</strong>. ' +
+      'A letra <strong>' + letraAtual + '</strong> usa ' + desc + '. Tente novamente!' +
+      '</div>';
+
+    // Exibe a resposta correta por 1,8 s e depois libera para nova tentativa
+    aCelula.setAtivos(corretos);
+    setarCelula(false);
+    setTimeout(function() {
+      aCelula.limpar();
+      setarCelula(true);
+      document.getElementById('a-pontos-info').textContent = 'Nenhum ponto selecionado';
+    }, 1800);
+
+    narrar('Incorreto. A letra ' + letraAtual + ' usa ' + desc + '. Tente novamente.');
+  }
+}
+
+function narrarEstado() {
+  if (!letraAtual) return;
+  var pontos = BRAILLE[letraAtual] || [];
+  var sel    = aCelula.getAtivos().slice().sort(function(a,b){return a-b;});
+  var descSel = sel.length
+    ? 'Você selecionou ' + (sel.length === 1 ? 'o ponto ' : 'os pontos ') + sel.join(', ') + '.'
+    : 'Nenhum ponto selecionado.';
+  narrar(
+    'Monte a letra ' + letraAtual + '. ' +
+    descSel + ' ' +
+    'A letra ' + letraAtual + ' usa ' + descreverPontos(pontos) + '.'
+  );
+}
+
+function setarCelula(habilitar) {
+  document.querySelectorAll('#celula-a .braille-dot').forEach(function(d) {
+    d.style.pointerEvents = habilitar ? 'auto' : 'none';
+    d.style.opacity       = habilitar ? '1'    : '0.75';
+  });
+}
+
+function descreverPontos(lista) {
+  return lista.length === 1
+    ? 'o ponto ' + lista[0]
+    : 'os pontos ' + lista.join(', ');
+}
+</script>
+{% endblock %}

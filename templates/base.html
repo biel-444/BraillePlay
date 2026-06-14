@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}BraillePlay{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="logo-dot"></span>
+        BraillePlay
+      </a>
+      <div class="nav-burger" id="nav-burger" aria-label="Menu" role="button" tabindex="0">
+        <span></span><span></span><span></span>
+      </div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/"        {% if request.endpoint == 'index'   %}class="active"{% endif %}>Início</a></li>
+        <li><a href="/aprender"{% if request.endpoint == 'aprender'%}class="active"{% endif %}>Aprender</a></li>
+        <li><a href="/forca"   {% if request.endpoint == 'forca'   %}class="active"{% endif %}>Forca</a></li>
+        <li><a href="/conversor"{% if request.endpoint == 'conversor'%}class="active"{% endif %}>Conversor</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <div class="modal-overlay" id="modal-ajuda" role="dialog" aria-modal="true" aria-label="Ajuda Braille">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📖 Ajuda — Letra <span id="ajuda-letra" class="text-accent"></span></h3>
+        <button class="modal-close" onclick="fecharAjuda()" aria-label="Fechar">✕</button>
+      </div>
+      <div class="flex gap-24" style="flex-wrap:wrap; align-items:flex-start;">
+        <div>
+          <p class="text-sm text-muted mb-8" style="font-weight:700;">Braille</p>
+          <div class="braille-cell-mini" id="ajuda-celula">
+            <div class="dot-mini" data-dot="1"></div>
+            <div class="dot-mini" data-dot="4"></div>
+            <div class="dot-mini" data-dot="2"></div>
+            <div class="dot-mini" data-dot="5"></div>
+            <div class="dot-mini" data-dot="3"></div>
+            <div class="dot-mini" data-dot="6"></div>
+          </div>
+          <p class="text-sm text-muted mt-8" id="ajuda-pontos"></p>
+        </div>
+        <div>
+          <p class="text-sm text-muted mb-8" style="font-weight:700;">Datilologia (Libras)</p>
+          <img id="ajuda-libras" class="libras-img" src="" alt="" />
+          <div id="ajuda-libras-ph" class="libras-placeholder" style="display:none;">
+            <span style="font-size:2rem;">🤟</span>
+            <span>Imagem não<br>disponível</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-referencia" role="dialog" aria-modal="true" aria-label="Referência do alfabeto Braille e Libras">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3>📖 Alfabeto — Braille &amp; Libras</h3>
+        <button class="modal-close" onclick="fecharReferencia()" aria-label="Fechar">✕</button>
+      </div>
+      <p class="text-sm text-muted mb-16">Toque em uma letra para ouvi-la.</p>
+      <div class="referencia-grid" id="referencia-grid"></div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  {% block scripts %}{% endblock %}
+
+</body>
+</html>

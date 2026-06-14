@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% block title %}Forca Braille — BraillePlay{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px; padding-bottom:80px; position:relative; z-index:1;">
+
+  <!-- TELA 1: Jogador 1 digita a palavra -->
+  <div id="tela-digitar">
+    <div class="text-center mb-32 anim-fadeInUp">
+      <span class="badge badge-accent mb-12">Módulo 2</span>
+      <h2>Forca <span class="text-accent">Braille</span></h2>
+      <p class="mt-8">Use a célula Braille para descobrir a palavra secreta.</p>
+    </div>
+
+    <div class="card anim-fadeInUp delay-100" style="max-width:480px; margin:0 auto;">
+      <h3 class="mb-8" style="color:var(--text);">👤 Jogador 1 — Palavra Secreta</h3>
+      <p class="text-sm text-muted mb-24">Digite a palavra e passe o dispositivo ao próximo jogador.</p>
+
+      <label class="text-sm fw-bold text-muted mb-8" style="display:block;">Palavra secreta (apenas letras A–Z)</label>
+      <input
+        type="password"
+        id="input-palavra-secreta"
+        class="input mb-8"
+        placeholder="Ex.: BORBOLETA"
+        maxlength="20"
+        autocomplete="off"
+        style="letter-spacing:0.2em; font-size:1.2rem; text-transform:uppercase;"
+      />
+      <p id="erro-palavra" class="text-sm text-danger hidden mb-8">Use apenas letras A–Z, sem acentos.</p>
+
+      <label class="text-sm fw-bold text-muted mb-8" style="display:block; margin-top:16px;">Seu nome (Jogador 1)</label>
+      <input type="text" id="input-nome-j1" class="input mb-24" placeholder="Nome do jogador 1" maxlength="20" />
+
+      <button class="btn btn-primary btn-block" onclick="confirmarPalavraSecreta()">Confirmar →</button>
+    </div>
+  </div>
+
+  <!-- TELA 2: Passe o dispositivo -->
+  <div id="tela-passe" class="hidden" style="max-width:480px; margin:0 auto;">
+    <div class="card text-center anim-fadeInUp">
+      <div style="font-size:4rem; margin-bottom:16px;">📲</div>
+      <h3 style="color:var(--text); margin-bottom:12px;">Passe o dispositivo!</h3>
+      <p class="text-muted mb-8">A palavra foi registrada com sucesso.</p>
+      <p class="text-muted mb-32">Passe ao próximo jogador e peça que clique em <strong style="color:#B45309;">Iniciar Jogo</strong>.</p>
+
+      <label class="text-sm fw-bold text-muted mb-8" style="display:block;">Nome do Jogador 2</label>
+      <input type="text" id="input-nome-j2" class="input mb-24" placeholder="Nome do jogador 2" maxlength="20" />
+
+      <button class="btn btn-accent btn-block" onclick="iniciarJogo()">🎯 Iniciar Jogo</button>
+    </div>
+  </div>
+
+  <!-- TELA 3: Jogo principal -->
+  <div id="tela-jogo" class="hidden">
+
+    <div class="flex justify-between items-center mb-24 anim-fadeInUp" style="flex-wrap:wrap; gap:12px;">
+      <div>
+        <p class="text-sm text-muted">Jogador</p>
+        <p class="fw-black" id="jogo-nome" style="color:var(--text);">—</p>
+      </div>
+      <div class="flex gap-16 items-center" style="flex-wrap:wrap;">
+        <div class="text-center">
+          <p class="text-sm text-muted">Tempo</p>
+          <p class="timer" id="jogo-timer">00:00</p>
+        </div>
+        <div>
+          <p class="text-sm text-muted mb-4">Vidas</p>
+          <div class="lives" id="jogo-vidas"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card text-center mb-16 anim-fadeInUp delay-100">
+      <div class="word-display" id="jogo-palavra"></div>
+    </div>
+
+    <div class="card card-sm mb-16 anim-fadeInUp delay-100">
+      <p class="text-sm text-muted mb-8">Letras tentadas:</p>
+      <div class="tried-letters" id="jogo-tentadas">
+        <span class="text-sm text-muted">—</span>
+      </div>
+    </div>
+
+    <div class="card text-center anim-fadeInUp delay-200">
+      <div class="flex justify-between items-center mb-16" style="flex-wrap:wrap; gap:8px;">
+        <p class="text-muted fw-bold">Monte uma letra e envie:</p>
+        <button class="btn btn-ghost btn-sm" id="jogo-ajuda-btn">❓ Ajuda</button>
+      </div>
+
+      <div class="braille-cell" id="celula-forca" style="margin:0 auto 12px;">
+        <div class="braille-dot" data-dot="1">1</div>
+        <div class="braille-dot" data-dot="4">4</div>
+        <div class="braille-dot" data-dot="2">2</div>
+        <div class="braille-dot" data-dot="5">5</div>
+        <div class="braille-dot" data-dot="3">3</div>
+        <div class="braille-dot" data-dot="6">6</div>
+      </div>
+
+      <p class="text-sm text-muted mb-8">
+        💡 Clique na célula e use as teclas <strong>1</strong> a <strong>6</strong> para marcar os pontos
+      </p>
+
+      <p class="text-sm text-muted mb-8" id="jogo-pontos-info">Nenhum ponto selecionado</p>
+      <p class="fw-black mb-16" id="jogo-letra-formada"
+         style="font-size:2.5rem; color:var(--primary); min-height:3rem;"></p>
+
+      <div class="flex gap-12 justify-center" style="flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="forcaCelula && forcaCelula.limpar()">🗑 Limpar</button>
+        <button class="btn btn-accent" id="jogo-btn-enviar" onclick="enviarLetraForca()">Enviar Letra →</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Overlay de resultado -->
+<div class="result-overlay" id="result-overlay">
+  <div class="result-box">
+    <div class="result-icon" id="result-icon">🏆</div>
+    <h2 id="result-titulo" style="margin-bottom:12px;"></h2>
+    <p class="text-muted mb-8" id="result-palavra"></p>
+    <p class="timer mb-24" id="result-tempo"></p>
+    <div class="flex gap-12 justify-center" style="flex-wrap:wrap;">
+      <a href="/forca" class="btn btn-ghost">Jogar de novo</a>
+      <a href="/"      class="btn btn-primary">Início</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let palavraSecreta  = '';
+let nomeJogador     = 'Anônimo';
+let letrasReveladas = new Set();
+let letrasErradas   = new Set();
+let vidasMax        = 6;
+let vidasRestantes  = 6;
+let timerInterval   = null;
+let segundos        = 0;
+let forcaCelula     = null;
+let jogoAtivo       = false;
+
+const telas = ['tela-digitar', 'tela-passe', 'tela-jogo'];
+function mostrarTela(id) {
+  telas.forEach(t => document.getElementById(t).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function confirmarPalavraSecreta() {
+  const palavra = document.getElementById('input-palavra-secreta').value.toUpperCase().trim();
+  const erroEl  = document.getElementById('erro-palavra');
+  if (!/^[A-Z]{2,20}$/.test(palavra)) { erroEl.classList.remove('hidden'); return; }
+  erroEl.classList.add('hidden');
+  palavraSecreta = palavra;
+  nomeJogador = (document.getElementById('input-nome-j1').value.trim() || 'Jogador 1') + ' & ';
+  mostrarTela('tela-passe');
+}
+
+function iniciarJogo() {
+  nomeJogador    += document.getElementById('input-nome-j2').value.trim() || 'Jogador 2';
+  letrasReveladas = new Set();
+  letrasErradas   = new Set();
+  vidasRestantes  = vidasMax;
+  segundos        = 0;
+  jogoAtivo       = true;
+
+  document.getElementById('jogo-nome').textContent     = nomeJogador;
+  document.getElementById('jogo-tentadas').innerHTML   = '<span class="text-sm text-muted">—</span>';
+
+  renderizarVidas();
+  renderizarPalavra();
+
+  forcaCelula = inicializarCelula(document.getElementById('celula-forca'), (ativos) => {
+    const info    = document.getElementById('jogo-pontos-info');
+    const letraEl = document.getElementById('jogo-letra-formada');
+    if (!ativos.length) {
+      info.textContent    = 'Nenhum ponto selecionado';
+      letraEl.textContent = '';
+    } else {
+      info.textContent    = `Pontos: ${ativos.sort((a,b)=>a-b).join(', ')}`;
+      const l             = identificarLetra(ativos);
+      letraEl.textContent = l || '?';
+      letraEl.style.color = l ? 'var(--primary)' : 'var(--text3)';
+    }
+  });
+
+  pararTimer();
+  timerInterval = setInterval(() => {
+    segundos++;
+    document.getElementById('jogo-timer').textContent = formatarTempo(segundos);
+  }, 1000);
+
+  document.getElementById('jogo-ajuda-btn').onclick = () => {
+    abrirReferencia();
+  };
+
+  mostrarTela('tela-jogo');
+}
+
+function renderizarVidas() {
+  const el = document.getElementById('jogo-vidas');
+  el.innerHTML = '';
+  for (let i = 0; i < vidasMax; i++) {
+    const d = document.createElement('div');
+    d.className = 'life-dot' + (i >= vidasRestantes ? ' lost' : '');
+    el.appendChild(d);
+  }
+}
+
+function renderizarPalavra() {
+  const el = document.getElementById('jogo-palavra');
+  el.innerHTML = '';
+  for (const letra of palavraSecreta) {
+    const slot = document.createElement('div');
+    slot.className = 'letter-slot';
+    if (letrasReveladas.has(letra)) { slot.textContent = letra; slot.classList.add('revealed'); }
+    el.appendChild(slot);
+  }
+}
+
+function renderizarTentadas() {
+  const el = document.getElementById('jogo-tentadas');
+  el.innerHTML = '';
+  const tentadas = [...letrasReveladas, ...letrasErradas].sort();
+  if (!tentadas.length) { el.innerHTML = '<span class="text-sm text-muted">—</span>'; return; }
+  tentadas.forEach(l => {
+    const chip = document.createElement('div');
+    chip.className  = 'tried-letter ' + (letrasReveladas.has(l) ? 'hit' : 'miss');
+    chip.textContent = l;
+    el.appendChild(chip);
+  });
+}
+
+function enviarLetraForca() {
+  if (!jogoAtivo) return;
+  const letra = identificarLetra(forcaCelula ? forcaCelula.getAtivos() : []);
+  if (!letra) { toast('Monte uma letra válida antes de enviar!', 'info', 1800); return; }
+  if (letrasReveladas.has(letra) || letrasErradas.has(letra)) {
+    toast(`Você já tentou a letra ${letra}!`, 'accent', 1800); return;
+  }
+
+  forcaCelula.limpar();
+  document.getElementById('jogo-pontos-info').textContent  = 'Nenhum ponto selecionado';
+  document.getElementById('jogo-letra-formada').textContent = '';
+
+  if (palavraSecreta.includes(letra)) {
+    letrasReveladas.add(letra);
+    renderizarPalavra();
+    toast(`✅ A letra ${letra} está na palavra!`, 'success');
+    const unicas = new Set([...palavraSecreta]);
+    if ([...unicas].every(l => letrasReveladas.has(l))) encerrarJogo(true);
+  } else {
+    letrasErradas.add(letra);
+    vidasRestantes--;
+    renderizarVidas();
+    toast(`❌ Letra ${letra} não está na palavra.`, 'danger');
+    if (vidasRestantes <= 0) encerrarJogo(false);
+  }
+  renderizarTentadas();
+}
+
+function encerrarJogo(vitoria) {
+  jogoAtivo = false;
+  pararTimer();
+  document.getElementById('result-icon').textContent    = vitoria ? '🏆' : '💀';
+  document.getElementById('result-titulo').textContent  = vitoria ? 'Parabéns!' : 'Fim de Jogo!';
+  document.getElementById('result-titulo').style.color  = vitoria ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('result-palavra').textContent = `Palavra: ${palavraSecreta}`;
+  document.getElementById('result-tempo').textContent   = formatarTempo(segundos);
+  document.getElementById('result-overlay').classList.add('open');
+}
+
+function pararTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+</script>
+{% endblock %}
