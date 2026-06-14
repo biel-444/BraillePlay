@@ -1,4 +1,4 @@
-# ⠃⠕⠍⠀⠙⠊⠁ — BraillePlay 🎮
+# ⠃⠕⠍⠀⠙⠊⠁ — BraillePlay 
 
 > **Plataforma web educacional e inclusiva para o aprendizado prático do alfabeto Braille e da datilologia em Libras.**
 
@@ -51,7 +51,7 @@ Para contornar instabilidades de rede e limitações de sistemas operacionais, o
 
 ---
 
-## ♿ Acessibilidade Integrada (Atalhos e Referência)
+## Acessibilidade Integrada (Atalhos e Referência)
 
 O projeto foi desenhado sob a perspectiva do design inclusivo:
 * **Navegação por Teclado:** Ao focar na célula Braille, as teclas de **1 a 6** ativam/desativam diretamente os respectivos pontos, com feedback em tempo real para leitores de tela ("Ponto N ativado").
