@@ -11,25 +11,25 @@ O **BraillePlay** é uma aplicação web desenvolvida para tornar o ensino do si
 
 ---
 
-## 🚀 Módulos Funcionais
+## Módulos Funcionais
 
 A aplicação está dividida em três pilares interativos:
 
-### 1. Módulo Aprender 🧠
+### 1. Módulo Aprender 
 * **Como funciona:** O usuário é desafiado a montar letras sorteadas aleatoriamente em uma célula Braille virtual de 6 pontos.
 * **Recursos:** Feedback visual e sonoro imediato, animações explicativas em caso de erro e botão de ajuda instantânea.
 
-### 2. Forca Braille 💀
+### 2. Forca Braille 
 * **Como funciona:** Jogo tradicional adaptado para dois jogadores no mesmo dispositivo. O Jogador 1 insere uma palavra secreta e o Jogador 2 deve adivinhá-la ativando os pontos correspondentes na célula Braille em vez de usar o teclado convencional.
 * **Recursos:** Cronômetro integrado, gerenciamento de vidas animado e acesso rápido ao painel de referência cruzada.
 
-### 3. Conversor Texto ↔ Braille 🔁
+### 3. Conversor Texto ↔ Braille 
 * **Como funciona:** Traduz textos livres de até 200 caracteres para o bloco de caracteres Unicode oficiais do Braille (`U+2800` a `U+28FF`).
 * **Recursos:** Exibição de mini-células táteis virtuais interativas e sistema de áudio caractere por caractere ou da frase completa.
 
 ---
 
-## 🛠️ Stack Tecnológica
+## Stack Tecnológica
 
 ### Backend
 * **Python 3.14 & Flask:** Motor do servidor, roteamento de APIs e renderização de templates dinâmicos com Jinja2.
@@ -42,7 +42,7 @@ A aplicação está dividida em três pilares interativos:
 
 ---
 
-## 🔊 Arquitetura Inteligente de Áudio (Dupla Camada)
+## Arquitetura Inteligente de Áudio (Dupla Camada)
 
 Para contornar instabilidades de rede e limitações de sistemas operacionais, o sistema de narração foi projetado com resiliência:
 
@@ -60,7 +60,7 @@ O projeto foi desenhado sob a perspectiva do design inclusivo:
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```text
 BraillePlay/
