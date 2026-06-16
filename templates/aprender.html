@@ -66,6 +66,8 @@
          style="flex-wrap:wrap; gap:12px;">
       <span class="badge badge-primary">Monte a Letra</span>
       <div class="flex gap-8 items-center">
+        <button class="btn btn-primary btn-sm" id="btn-jogar"
+                aria-label="Jogar">Jogar</button>
         <button class="btn btn-ghost btn-sm" id="btn-ouvir"
                 aria-label="Ouvir descrição">🔊 Ouvir</button>
         <button class="btn btn-ghost btn-sm" id="ajuda-btn-a"
@@ -172,16 +174,20 @@ document.getElementById('a-btn-limpar').addEventListener('click', function() {
 document.getElementById('a-btn-verificar').addEventListener('click', verificar);
 document.getElementById('a-btn-proxima').addEventListener('click', proximaLetra);
 document.getElementById('btn-ouvir').addEventListener('click', narrarEstado);
+document.getElementById('btn-jogar').addEventListener('click', function() {
+  narrar('Nova letra sorteada. Monte a letra ' + letraAtual + ' na célula Braille.');
+});
 document.getElementById('ajuda-btn-a').addEventListener('click', function() {
   if (letraAtual) abrirAjuda(letraAtual);
 });
 
-// ── Inicia com a primeira letra ─────────────────────────────
-proximaLetra();
+// ── Prepara a primeira letra ao carregar a página (sem narração) ──
+sortearLetra();
 
 // ── Funções ─────────────────────────────────────────────────
 
-function proximaLetra() {
+// Sorteia uma letra e prepara a interface, sem disparar áudio
+function sortearLetra() {
   letraAtual = letras[Math.floor(Math.random() * letras.length)];
 
   document.getElementById('a-letra-alvo').textContent = letraAtual;
@@ -192,7 +198,11 @@ function proximaLetra() {
 
   aCelula.limpar();
   setarCelula(true);
+}
 
+// Sorteia a próxima letra e narra (usado pelo botão "Próxima →", já é um clique)
+function proximaLetra() {
+  sortearLetra();
   narrar('Nova letra sorteada. Monte a letra ' + letraAtual + ' na célula Braille.');
 }
 

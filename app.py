@@ -133,5 +133,5 @@ def api_tts():
 
 
 if __name__ == '__main__':
-    print("🟣 BraillePlay em http://localhost:5000")
+    print(" BraillePlay em http://localhost:5000")
     app.run(debug=True, port=5000)
